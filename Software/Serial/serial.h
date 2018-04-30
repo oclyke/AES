@@ -49,7 +49,7 @@ serial_HandleTypeDef serial6;
 void serial_initialize(serial_HandleTypeDef * hserial);
 uint16_t serial_read(serial_HandleTypeDef * hserial, uint8_t * pdata, uint16_t size);
 void serial_write(serial_HandleTypeDef * hserial, uint8_t * pdata, uint16_t size);
-void serial_print_uint32(serial_HandleTypeDef * hserial, uint32_t val);
+void serial_print_uint32(serial_HandleTypeDef * hserial, uint32_t val, uint8_t format, uint8_t min_digits);
 void serial_print_double(serial_HandleTypeDef * hserial, double val);
 
 void serial_HAL_UART_MspInit(UART_HandleTypeDef* uartHandle);
@@ -59,6 +59,7 @@ void serial_HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle);
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef * huart);
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef * huart);
 
+uint32_t serial_utility_DD(uint16_t bin);							// Double dabble makes uints into BPD
 
 
 
