@@ -32,6 +32,7 @@ void serial_initialize(serial_HandleTypeDef * hserial)
   hserial->read_index = 0;
   hserial->write_ok = 1;
   hserial->active = 1;
+  hserial->transmit_complete = 1;
   
   // Begin listening
   HAL_UART_Receive_IT(hserial->huart, &(hserial->lock), serial_default_receive_size); // first dominoe: this will wait till one byte is received then perform the callback function which contnues the chain reaction
@@ -65,8 +66,9 @@ uint16_t serial_read(serial_HandleTypeDef * hserial, uint8_t * pdata, uint16_t s
 
 void serial_write(serial_HandleTypeDef * hserial, uint8_t * pdata, uint16_t size)
 {
-  while(~(HAL_UART_GetState(hserial->huart) == HAL_UART_STATE_READY)){};		// Wait until it is ready...
-  HAL_UART_Transmit_IT(hserial->huart, pdata, size);
+	while((hserial->transmit_complete) == 0){};		// Wait until it is ready...
+	HAL_UART_Transmit_IT(hserial->huart, pdata, size);
+	hserial->transmit_complete = 0;
 }
 
 void serial_print_uint32(serial_HandleTypeDef * hserial, uint32_t val)
@@ -291,6 +293,15 @@ void serial_HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef * huart)
 {
   //__NOP();
+	serial_HandleTypeDef *temp_serial_ptr;
+
+	// Get the corresponding serial handle
+	if(huart->Instance == USART1){ temp_serial_ptr = &serial1; }
+	else if(huart->Instance == USART2){ temp_serial_ptr = &serial2; }
+	else if(huart->Instance == USART6){ temp_serial_ptr = &serial6; }
+	else{ _Error_Handler(__FILE__, __LINE__); }
+
+	temp_serial_ptr->transmit_complete = 1;
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef * huart)
@@ -299,14 +310,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef * huart)
 
   serial_HandleTypeDef *temp_serial_ptr;
 
-//  // Get  the corresponding serial handle
-//  switch(huart->Instance){
-//    case USART1 : temp_serial_ptr = &serial1; break;
-//    case USART2 : temp_serial_ptr = &serial2; break;
-//    case USART6 : temp_serial_ptr = &serial6; break;
-//    default : _Error_Handler(__FILE__, __LINE__); break;
-//  }
-
+  // Get the corresponding serial handle
   if(huart->Instance == USART1){ temp_serial_ptr = &serial1; }
   else if(huart->Instance == USART2){ temp_serial_ptr = &serial2; }
   else if(huart->Instance == USART6){ temp_serial_ptr = &serial6; }
@@ -337,4 +341,3 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef * huart)
     HAL_UART_Receive_IT(temp_serial_ptr->huart, &(temp_serial_ptr->lock), serial_default_receive_size); // Call the receive function again to continue the chain reaction
   }
 }
-
