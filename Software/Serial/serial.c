@@ -71,15 +71,119 @@ void serial_write(serial_HandleTypeDef * hserial, uint8_t * pdata, uint16_t size
 	hserial->transmit_complete = 0;
 }
 
-void serial_print_uint32(serial_HandleTypeDef * hserial, uint32_t val)
+void serial_print_uint32(serial_HandleTypeDef * hserial, uint32_t val, uint8_t format, uint8_t min_digits)
 {
-  // Coming soon
+	uint8_t character = '0';
+	uint8_t leading_zeros = 1;
+	uint8_t prefix[2] = {0x00,0x00};
+	uint32_t BPD = 0x00;
+	switch(format){
+	case 0 :
+		// Hexadecimal
+		prefix[0] = '0';
+		prefix[1] = 'x';
+		serial_write(hserial, &prefix[0], 2);
+		for(uint8_t indi = 0; indi < 8; indi++)
+		{
+			switch((val & (0xF << (4*(7-indi)))) >> (4*(7-indi)) ){
+			case 0x0 : character = '0'; break;
+			case 0x1 : character = '1'; break;
+			case 0x2 : character = '2'; break;
+			case 0x3 : character = '3'; break;
+			case 0x4 : character = '4'; break;
+			case 0x5 : character = '5'; break;
+			case 0x6 : character = '6'; break;
+			case 0x7 : character = '7'; break;
+			case 0x8 : character = '8'; break;
+			case 0x9 : character = '9'; break;
+			case 0xA : character = 'A'; break;
+			case 0xB : character = 'B'; break;
+			case 0xC : character = 'C'; break;
+			case 0xD : character = 'D'; break;
+			case 0xE : character = 'E'; break;
+			case 0xF : character = 'F'; break;
+			}
+			if((character != '0')){ leading_zeros = 0; }
+			if( (!leading_zeros) || ((8-indi) <= min_digits) ){serial_write(hserial, &character, 1);}
+		}
+		break;
+
+	case 1 :
+		// Decimal
+		BPD = serial_utility_DD((uint16_t)(val & 0x0000FFFF));
+		for(uint8_t indi = 0; indi < 8; indi++)
+		{
+			switch( (BPD & (0x0F << (4*(7-indi)))  ) >> (4*(7-indi)) )
+			{
+				case 0x0 : character = '0'; break;
+				case 0x1 : character = '1'; break;
+				case 0x2 : character = '2'; break;
+				case 0x3 : character = '3'; break;
+				case 0x4 : character = '4'; break;
+				case 0x5 : character = '5'; break;
+				case 0x6 : character = '6'; break;
+				case 0x7 : character = '7'; break;
+				case 0x8 : character = '8'; break;
+				case 0x9 : character = '9'; break;
+			}
+			if((character != '0')){ leading_zeros = 0; }
+			if( (!leading_zeros) || ((8-indi) <= min_digits) ){serial_write(hserial, &character, 1);}
+		}
+		break;
+
+	case 2 :
+		// Binary
+		prefix[0] = '0';
+		prefix[1] = 'b';
+		serial_write(hserial, &prefix[0], 2);
+		for(uint8_t indi = 0; indi < 32; indi++)
+		{
+			switch((val & (0b1 << (31-indi))) >> (31-indi)){
+			case 0x0 : character = '0'; break;
+			case 0x1 : character = '1'; break;
+			}
+			if((character != '0')){ leading_zeros = 0; }
+			if( (!leading_zeros) || ((32-indi) <= min_digits) ){serial_write(hserial, &character, 1);}
+		}
+		break;
+	}
 }
 
 void serial_print_double(serial_HandleTypeDef * hserial, double val)
 {
   // Coming soon
 }
+
+
+
+uint32_t serial_utility_DD(uint16_t bin)
+{
+	uint32_t reg0 = 0;
+	uint8_t reg1 = 0;
+
+	reg0 |= bin; // Initialization
+
+	// Loop over all required shifts
+	for(uint8_t indi = 0; indi < 16; indi++)
+	{
+		// Check the nibbles in the scratch space to see if they need to be added to
+		for(uint8_t indj = 0; indj < 5; indj++)
+		{
+			if(indj < 4){ if(((reg0 & (0x0F << (4*indj + 16))) >> (4*indj + 16)) > 4){ reg0 += (3 << (4*indj + 16)); } }
+			else{ if(reg1 > 4){ reg1 += 3; } }
+		}
+		// Now shift left by one (all registers)
+		reg1 = (reg1 << 1);
+		reg1 |= ((reg0 & 0x80000000) >> 31);
+		reg0 = (reg0 << 1);
+
+	}
+
+	// Now the result should exist in
+	return ((reg1 << 16) | (reg0 >> 16));
+}
+
+
 
 
 
