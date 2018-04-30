@@ -29,6 +29,8 @@ typedef struct{
 	volatile uint8_t 		lock;		// A temporary storage place for a single byte while it gets handled properly: like a "lock" for boats
 	uint8_t					*pbuff;		// Pointer to the buffer to be used for the communication
 
+	volatile uint8_t					transmit_complete;	// Value of 1 if the transmit is complete, zero otherwise
+
 	uint8_t					active;		// Indicates if the serial object is being used
 	volatile uint16_t		write_index;// The index of pbuff at which to store the next received byte, if allowed
 	volatile uint16_t		read_index;	// The index of pbuff from which to take the next byte
@@ -64,6 +66,5 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef * huart);
 
 
 #endif /* SERIAL_H */
-
 
 
