@@ -65,6 +65,7 @@ uint16_t serial_read(serial_HandleTypeDef * hserial, uint8_t * pdata, uint16_t s
 
 void serial_write(serial_HandleTypeDef * hserial, uint8_t * pdata, uint16_t size)
 {
+  while(~(HAL_UART_GetState(hserial->huart) == HAL_UART_STATE_READY)){};		// Wait until it is ready...
   HAL_UART_Transmit_IT(hserial->huart, pdata, size);
 }
 
