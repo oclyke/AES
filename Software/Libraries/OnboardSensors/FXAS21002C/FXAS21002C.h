@@ -10,9 +10,7 @@ Updated April 2018
 #define FXAS21002C_H
 
 // Includes
-#include "stm32f4xx_hal_spi.h"
-#include "stm32f4xx_hal_gpio.h"
-
+#include "stm32f4xx_hal.h"
 
 
 
