@@ -47,8 +47,12 @@ serial_HandleTypeDef serial6;
 
 /* Functions */
 void serial_initialize(serial_HandleTypeDef * hserial);
+void serial_clear(serial_HandleTypeDef * hserial);												// Resets the serial port - sets writeOK to 1, sets num_avail to 0, sets read and write indices to 0
 uint16_t serial_read(serial_HandleTypeDef * hserial, uint8_t * pdata, uint16_t size);
+uint8_t serial_peek(serial_HandleTypeDef * hserial);
 void serial_write(serial_HandleTypeDef * hserial, uint8_t * pdata, uint16_t size);
+void serial_print(serial_HandleTypeDef * hserial, uint8_t * pdata);
+void serial_println(serial_HandleTypeDef * hserial, uint8_t * pdata);
 void serial_print_uint32(serial_HandleTypeDef * hserial, uint32_t val, uint8_t format, uint8_t min_digits);
 void serial_print_double(serial_HandleTypeDef * hserial, double val);
 
