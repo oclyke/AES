@@ -11,9 +11,6 @@ ToDo:
 */
 
 // Macros
-
-#include "stm32f4xx_hal.h"
-#include "stm32f4xx_hal_spi.h"
 #include "FXAS21002C.h"
 
 // Functions
