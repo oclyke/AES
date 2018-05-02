@@ -4,7 +4,7 @@ FXAS21002C.c
 Header: FXAS21002C.h
 
 Written by Owen Lyke, April 2018
-Updated April 2018
+Updated May 2018
 
 ToDo: 
 
@@ -20,7 +20,7 @@ ToDo:
 // ---------
 void FXAS21002C_init(FXAS21002C_HandleTypeDef *hFXAS21002C)
 {
-	LIS3MDL_assert_spi_bus(hLIS3MDL);																						// Ensure the SPI bus is ready for this sensor
+	FXAS21002C_assert_spi_bus(hFXAS21002C);																						// Ensure the SPI bus is ready for this sensor
 
 	FXAS21002C_write(hFXAS21002C, FXAS21002C_REG_F_SETUP, &(hFXAS21002C->Init.F_SETUP_VAL), 1, hFXAS21002C->Timeout); 				// Set F_SETUP from user values
 	FXAS21002C_write(hFXAS21002C, FXAS21002C_REG_RT_CFG, &(hFXAS21002C->Init.RT_CFG_VAL), 1, hFXAS21002C->Timeout); 					// Set RT_CFG from user values
