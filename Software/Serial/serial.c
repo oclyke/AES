@@ -38,6 +38,13 @@ void serial_initialize(serial_HandleTypeDef * hserial)
   HAL_UART_Receive_IT(hserial->huart, &(hserial->lock), serial_default_receive_size); // first dominoe: this will wait till one byte is received then perform the callback function which contnues the chain reaction
 }
 
+void serial_clear(serial_HandleTypeDef * hserial)
+{
+	hserial->num_avail = 0;
+	hserial->write_index = 0;
+	hserial->read_index = 0;
+	hserial->write_ok = 1;
+}
 
 uint16_t serial_read(serial_HandleTypeDef * hserial, uint8_t * pdata, uint16_t size)
 {
@@ -64,11 +71,32 @@ uint16_t serial_read(serial_HandleTypeDef * hserial, uint8_t * pdata, uint16_t s
   return indi;
 }
 
+uint8_t serial_peek(serial_HandleTypeDef * hserial)
+{
+	return *(hserial->pbuff + hserial->read_index);	// Simply return the value that would be read next, but don't chage the status of the data buffer
+}
+
 void serial_write(serial_HandleTypeDef * hserial, uint8_t * pdata, uint16_t size)
 {
 	while((hserial->transmit_complete) == 0){};		// Wait until it is ready...
 	HAL_UART_Transmit_IT(hserial->huart, pdata, size);
 	hserial->transmit_complete = 0;
+}
+
+void serial_print(serial_HandleTypeDef * hserial, uint8_t * pdata)
+{
+	uint16_t count = 0;
+	while(*(pdata + count) != '\0')
+	{
+		serial_write(hserial, pdata+count++, 1);
+	}
+}
+
+void serial_println(serial_HandleTypeDef * hserial, uint8_t * pdata)
+{
+	uint8_t newl = '\n';
+	serial_print(hserial, pdata);
+	serial_write(hserial, &newl, 1);
 }
 
 void serial_print_uint32(serial_HandleTypeDef * hserial, uint32_t val, uint8_t format, uint8_t min_digits)
