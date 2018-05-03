@@ -27,7 +27,7 @@ A library to interface with the LidarLite V3 Lidar Rangefinder via I2C on the ST
 
 // SIG_COUNT_VAL
 // -------------
-#define LIDARLITEV3_SIG_COUNT_VAL_DEFAULT		0x08 	
+#define LIDARLITEV3_SIG_COUNT_VAL_DEFAULT		0x80
 // Limits the number of times the device will integrate acquisitions to find a correlation record peak which occurs at long rage or with low target reflectivity. 
 // This controls the minimum measurement rate and maximum range. The unitless relationship is roughly as follows: rate = 1/n and range = n^(1/4) where n is the number of acquisitions
 
@@ -100,7 +100,7 @@ typedef enum {
 	LIDARLITEV3_REG_OUTER_LOOP_COUNT,
 	LIDARLITEV3_REG_REF_COUNT_VAL,
 	// Reserved 0x13
-	LIDARLITEV3_REG_LIDAR__REG_LAST_DELAY_HIGH		= 0x14,
+	LIDARLITEV3_REG_LAST_DELAY_HIGH		= 0x14,
 	LIDARLITEV3_REG_LAST_DELAY_LOW,
 	LIDARLITEV3_REG_UNIT_ID_HIGH,
 	LIDARLITEV3_REG_UNIT_ID_LOW,
@@ -170,6 +170,8 @@ uint8_t LIDARLITEV3_write_data_buffer[LIDARLITEV3_wdb_num_bytes];
 void 	LIDARLITEV3_init(LIDARLITEV3_HandleTypeDef *hLIDARLITEV3);
 void 	LIDARLITEV3_init_continuous_measurement(LIDARLITEV3_HandleTypeDef *hLIDARLITEV3, uint8_t DELAY, uint8_t MEASURE_TYPE);
 void	LIDARLITEV3_reset(LIDARLITEV3_HandleTypeDef *hLIDARLITEV3);
+
+void 	LIDARLITEV3_update_vals(LIDARLITEV3_HandleTypeDef *hLIDARLITEV3);
 
 void 	LIDARLITEV3_read(LIDARLITEV3_HandleTypeDef *hLIDARLITEV3, uint8_t reg_add, uint8_t *data_out_ptr, uint8_t num_reads, uint32_t timeout);		//
 void 	LIDARLITEV3_write(LIDARLITEV3_HandleTypeDef *hLIDARLITEV3, uint8_t reg_add, uint8_t *data_in_ptr, uint8_t num_writes, uint32_t timeout);
