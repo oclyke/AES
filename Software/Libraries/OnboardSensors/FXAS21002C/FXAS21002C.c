@@ -4,7 +4,7 @@ FXAS21002C.c
 Header: FXAS21002C.h
 
 Written by Owen Lyke, April 2018
-Updated May 2018
+Updated April 2018
 
 ToDo: 
 
