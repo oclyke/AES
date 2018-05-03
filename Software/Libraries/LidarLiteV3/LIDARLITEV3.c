@@ -47,6 +47,29 @@ void	LIDARLITEV3_reset(LIDARLITEV3_HandleTypeDef *hLIDARLITEV3)
 
 
 
+void 	LIDARLITEV3_update_vals(LIDARLITEV3_HandleTypeDef *hLIDARLITEV3)
+{
+	uint8_t	byteH = 0;
+	uint8_t byteL = 0;
+	LIDARLITEV3_read(hLIDARLITEV3,LIDARLITEV3_REG_LAST_DELAY_HIGH,&byteH,1,hLIDARLITEV3->Timeout);
+	LIDARLITEV3_read(hLIDARLITEV3,LIDARLITEV3_REG_LAST_DELAY_LOW,&byteL,1,hLIDARLITEV3->Timeout);
+	hLIDARLITEV3->D = ((byteH << 8) | byteL);
+
+	LIDARLITEV3_read(hLIDARLITEV3,LIDARLITEV3_REG_VELOCITY,&byteL,1,hLIDARLITEV3->Timeout);
+	hLIDARLITEV3->V = byteL;
+}
+
+void 	LIDARLITEV3_take_measurement(LIDARLITEV3_HandleTypeDef *hLIDARLITEV3, uint8_t measurement_type)
+{
+	uint8_t cmd = measurement_type;
+	LIDARLITEV3_write(hLIDARLITEV3, LIDARLITEV3_REG_ACQ_COMMAND, &cmd, 1, hLIDARLITEV3->Timeout);
+}
+
+
+
+
+
+
 
 void 	LIDARLITEV3_read(LIDARLITEV3_HandleTypeDef *hLIDARLITEV3, uint8_t reg_add, uint8_t *data_out_ptr, uint8_t num_reads, uint32_t timeout)
 {
